@@ -1,0 +1,7 @@
+setup.py
+src/oop_jpeg/__init__.py
+src/oop_jpeg/bit_stream.py
+src/oop_jpeg.egg-info/PKG-INFO
+src/oop_jpeg.egg-info/SOURCES.txt
+src/oop_jpeg.egg-info/dependency_links.txt
+src/oop_jpeg.egg-info/top_level.txt
