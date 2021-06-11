@@ -23,3 +23,6 @@ class Marker(enum.Enum):
     SOF = 0xC0
     DRI = 0xDD
     DHT = 0xC4
+    UNKNOWN = None
+    SOS = 0xDA
+    EOI = 0xD9

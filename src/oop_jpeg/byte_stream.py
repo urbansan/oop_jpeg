@@ -13,11 +13,11 @@ class ByteStream:
     def next_byte(self):
         pos = self.position
         self.position += 1
-        print(hex(self.bytes[pos]))
+        b = hex(self.bytes[pos])
         return self.bytes[pos]
 
     def next_bytes(self, amount: int):
-        return [self.next_byte for _ in range(amount)]
+        return [self.next_byte() for _ in range(amount)]
 
     def __bool__(self):
         return self.position < len(self.bytes)

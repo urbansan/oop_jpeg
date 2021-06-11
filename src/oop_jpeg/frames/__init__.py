@@ -1,1 +1,1 @@
-from .factory import factory_dict
+from .factory import MarkerFactory
