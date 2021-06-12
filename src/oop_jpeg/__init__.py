@@ -1,1 +1,1 @@
-from .byte_stream import ByteStream
+from .img_cls import Jpeg

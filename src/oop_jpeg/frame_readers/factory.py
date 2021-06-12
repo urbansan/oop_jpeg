@@ -1,22 +1,18 @@
 from ..utils import get_subclasses
-from .abstract import AbstractFrame
+from .abstract import AbstractReader
 from .markers import Marker
-from ._frames import DefaultFrame
+from .classes import UnknownReader
 
 
 factory_dict = {}
-#
-# for marker in Marker:
-#     factory_dict[marker.value] = DefaultFrame
-
-for cls in get_subclasses(AbstractFrame):
+for cls in get_subclasses(AbstractReader):
     factory_dict[cls.marker.value] = cls
 
 
-def MarkerFactory(byte):
+def ReaderFactory(byte):
     cls = factory_dict.get(byte)
     if cls is None:
-        default_frame = DefaultFrame([])
+        default_frame = UnknownReader([])
         try:
             default_frame.marker = Marker(byte)
         except ValueError as err:

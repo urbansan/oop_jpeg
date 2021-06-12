@@ -1,34 +1,34 @@
-from oop_jpeg import ByteStream
+from ..byte_stream import ByteStream
 from .markers import Marker
-from .abstract import AbstractFrame
+from .abstract import AbstractReader
 
 
-class DQT(AbstractFrame):
+class DqtReader(AbstractReader):
     marker = Marker.DQT
 
 
-class DHT(AbstractFrame):
+class DhtReader(AbstractReader):
     marker = Marker.DHT
 
 
-class APP0(AbstractFrame):
+class App0Reader(AbstractReader):
     marker = Marker.APP0
 
 
-class DefaultFrame(AbstractFrame):
+class UnknownReader(AbstractReader):
     marker = Marker.UNKNOWN
 
     def __repr__(self):
-        return f"{type(self).__name__} object with marker {self.marker!s}"
+        return f"<{type(self).__name__} object with marker {self.marker!s}>"
 
     def consume_stream(self, stream: ByteStream):
         objects = super().consume_stream(stream)
         for obj in objects:
-            obj.marker = self.marker
+            obj.reader = self.marker
         return objects
 
 
-class SOI(AbstractFrame):
+class SoiReader(AbstractReader):
     marker = Marker.SOI
 
     def consume_stream(self, stream: ByteStream):
@@ -36,7 +36,7 @@ class SOI(AbstractFrame):
         return [cls([])]
 
 
-class EOI(AbstractFrame):
+class EoiReader(AbstractReader):
     marker = Marker.SOI
 
     def consume_stream(self, stream: ByteStream):

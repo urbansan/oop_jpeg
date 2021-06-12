@@ -3,7 +3,7 @@ from typing import Iterable
 from ..byte_stream import ByteStream
 
 
-class AbstractFrame(abc.ABC):
+class AbstractReader(abc.ABC):
     @property
     @abc.abstractmethod
     def marker(self) -> int:
