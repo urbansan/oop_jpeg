@@ -1,5 +1,5 @@
 import abc
-from typing import Iterable
+from typing import List
 from ..byte_stream import ByteStream
 
 
@@ -14,12 +14,9 @@ class AbstractReader(abc.ABC):
 
     def consume_stream(self, stream: ByteStream):
         """:return count of consumed bytes"""
-        cls = type(self)
         length = (stream.next_byte() << 8) + stream.next_byte()
         bytes = stream.next_bytes(length - 2)
-        objects = [cls(data) for data in cls._parse_bytes(bytes)]
-        return objects
+        return self._parse_bytes(bytes)
 
-    @staticmethod
-    def _parse_bytes(bytes: Iterable[int]):
+    def _parse_bytes(self, bytes: List[int]):
         return [bytes]
