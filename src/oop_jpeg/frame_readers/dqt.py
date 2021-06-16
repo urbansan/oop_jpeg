@@ -19,7 +19,7 @@ class DqtReader(AbstractReader):
             else:
                 data = bytes_[position + 1: position + 65]
                 position += 65
-            dqt = DQT.from_stream_bytes(table_id, data)
+            dqt = DQT.from_byte_stream(table_id, data)
             DQTs.append(dqt)
         return DQTs
 
@@ -52,7 +52,7 @@ class DQT(list):
         self.id = table_id
 
     @classmethod
-    def from_stream_bytes(cls, table_id, bytes_):
+    def from_byte_stream(cls, table_id, bytes_):
         dqt = cls(table_id=table_id)
         for idx, byte in enumerate(bytes_):
             x, y = cls.zig_zag_indexes[idx]
