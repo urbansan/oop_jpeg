@@ -1,7 +1,7 @@
 from ..byte_stream import ByteStream
 from .markers import Marker
 from .abstract import AbstractReader
-from typing import List
+from typing import List, Iterable
 
 
 class UnknownFrame:
@@ -19,8 +19,6 @@ class App0Reader(AbstractReader):
 
 class UnknownReader(AbstractReader):
     marker = Marker.UNKNOWN
-
-
 
     def consume_stream(self, stream: ByteStream):
         objects = super().consume_stream(stream)
@@ -46,3 +44,18 @@ class EoiReader(AbstractReader):
     def consume_stream(self, stream: ByteStream):
         cls = type(self)
         return [cls([])]
+
+
+class COM:
+    def __init__(self, bytes_: Iterable[int]):
+        self._bytes = bytes_
+
+    def get_text(self):
+        raise NotImplemented
+
+
+class ComReader(AbstractReader):
+    marker = Marker.COM
+
+    def _parse_bytes(self, bytes_: List[int]):
+        return [COM(bytes_)]

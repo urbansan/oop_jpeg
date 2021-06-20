@@ -26,3 +26,12 @@ class Marker(enum.Enum):
     UNKNOWN = None
     SOS = 0xDA
     EOI = 0xD9
+    RST0 = 0xD0
+    RST1 = 0xD1
+    RST2 = 0xD2
+    RST3 = 0xD3
+    RST4 = 0xD4
+    RST5 = 0xD5
+    RST6 = 0xD6
+    RST7 = 0xD7
+    COM = 0xFE
