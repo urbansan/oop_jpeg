@@ -8,8 +8,9 @@ from .frame_readers import ReaderFactory
 class Jpeg:
     def __init__(self, filename: Path):
         self.frames = self._read_frames(filename)
-        for frame in self.frames:
-            frame.update_image_info(self)
+        print()
+        # for frame in self.frames:
+        #     frame.update_image_info(self)
 
     @staticmethod
     def _read_frames(filename: Path):

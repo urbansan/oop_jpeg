@@ -38,12 +38,12 @@ class SoiReader(AbstractReader):
         return [cls([])]
 
 
-class EoiReader(AbstractReader):
-    marker = Marker.SOI
-
-    def consume_stream(self, stream: ByteStream):
-        cls = type(self)
-        return [cls([])]
+# class EoiReader(AbstractReader):
+#     marker = Marker.SOI
+#
+#     def consume_stream(self, stream: ByteStream):
+#         cls = type(self)
+#         return [cls([])]
 
 
 class COM:

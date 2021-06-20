@@ -11,6 +11,7 @@ class SOS:
         self.start_of_selection = 0
         self.end_of_selection = 63
         self.successive_approximation = 0
+        self._huffman_bytes = []
 
     def __repr__(self):
         return f"{type(self).__name__}()"
@@ -39,6 +40,23 @@ class SOS:
             "dc": dc_huffman_table_id,
             "ac": ac_huffman_table_id,
         }
+
+    def read_huffman_bitstream(self, stream: ByteStream):
+        while stream:
+            last_byte = stream.next_byte()
+            if last_byte == 0xFF:
+                current_byte = stream.next_byte()
+                if current_byte == 0x00:
+                    self._huffman_bytes.append(last_byte)
+                elif current_byte == 0xFF:
+                    stream.position -= 1  # skip previous byte
+                    continue
+                elif Marker.RST0.value <= current_byte <= Marker.RST7.value:
+                    pass  # skip restart markers
+                elif current_byte == Marker.EOI.value:
+                    break  # break the loop
+            else:
+                self._huffman_bytes.append(last_byte)
 
     @classmethod
     def from_byte_stream(cls, bytes_):
@@ -72,6 +90,7 @@ class SosReader(AbstractReader):
 
     def consume_stream(self, stream: ByteStream):
         sos = super().consume_stream(stream)
+        sos.read_huffman_bitstream(stream)
         return [sos]
 
     def _parse_bytes(self, bytes_: List[int]):

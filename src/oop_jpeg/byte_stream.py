@@ -13,7 +13,7 @@ class ByteStream:
     def next_byte(self):
         pos = self.position
         self.position += 1
-        b = hex(self.bytes[pos])
+        # b = hex(self.bytes[pos])
         return self.bytes[pos]
 
     def next_bytes(self, amount: int):
