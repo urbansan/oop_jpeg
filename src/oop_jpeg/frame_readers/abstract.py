@@ -1,6 +1,6 @@
 import abc
 from typing import List
-from ..byte_stream import ByteStream
+from ..streams import ByteStream
 
 
 class AbstractReader(abc.ABC):

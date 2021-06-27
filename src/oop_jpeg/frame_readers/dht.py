@@ -9,50 +9,68 @@ class DhtReader(AbstractReader):
 
     def _parse_bytes(self, bytes_: List[int]):
         # a = [hex(b) for b in bytes_]
-        dhts = DHT.from_byte_stream(bytes_)
+        dhts = self._from_byte_stream(bytes_)
         return dhts
 
-
-class DHT(list):
-    def __init__(self, table_id, ac_dc_table_type):
-        super().__init__()
-        self.id = table_id
-        self._ac_dc = ac_dc_table_type
-
-    def __repr__(self):
-        return f"DHT-AC(table_id={self.id})" if self._ac_dc else f"DHT-DC(table_id={self.id})"
-
-    @classmethod
-    def from_byte_stream(cls, bytes_):
+    def _from_byte_stream(self, bytes_):
         remaining_bytes = bytes_
         dhts = []
         while remaining_bytes:
-            dht, remaining_bytes = cls.parse_dht(bytes_)
+            dht, remaining_bytes = DHT.from_byte_stream(bytes_)
             dhts.append(dht)
-        print()
         return dhts
-        # hex_symbols = [(hex(s >> 0xF), hex(s & 0xF)) for s in symbols]
+
+
+class DHT:
+    dht_type = None
+
+    def __init__(self, table_id, symbols: list):
+        self.id = table_id
+        self.symbols = symbols
+        self.code_to_symbol = self.generate_codes(symbols)
+
+    @staticmethod
+    def generate_codes(symbols):
+        code = 0
+        code_to_symbol = {}
+        for common_symbols in symbols:
+            for symbol in common_symbols:
+                code_to_symbol[code] = symbol
+                code += 1
+            code <<= 1
+
+        return code_to_symbol
+
+    def __repr__(self):
+        return f"{type(self).__name__}(table_id={self.id})"
 
     @classmethod
-    def parse_dht(cls, bytes_):
+    def from_byte_stream(cls, bytes_):
         table_type = bytes_[0] >> 4
         table_id = bytes_[0] & 0xF
         symbol_count = bytes_[1:17]
         sum_of_symbols = sum(symbol_count)
         symbols = bytes_[17 : 17 + sum_of_symbols + 1]
-        dht = cls(table_id, table_type)
+        temp_list = []
         total_length = 0
         for idx, length in enumerate(symbol_count):
-            dht.append(symbols[total_length : total_length + length])
+            temp_list.append(symbols[total_length : total_length + length])
             total_length += length
+        dht = cls.from_table_type(table_type, table_id, temp_list)
 
-        remaining_bytes = bytes_[17 + sum_of_symbols + 1:]
+        remaining_bytes = bytes_[17 + sum_of_symbols + 1 :]
         return dht, remaining_bytes
 
-    @property
-    def dc(self):
-        return self._ac_dc == 0
+    @classmethod
+    def from_table_type(cls, table_type, table_id, symbols):
+        for subcls in cls.__subclasses__():
+            if subcls.dht_type == table_type:
+                return subcls(table_id, symbols)
 
-    @property
-    def ac(self):
-        return self._ac_dc == 1
+
+class DHTac(DHT):
+    dht_type = 1
+
+
+class DHTdc(DHT):
+    dht_type = 0

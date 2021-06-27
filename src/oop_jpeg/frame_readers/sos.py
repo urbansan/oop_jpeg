@@ -2,7 +2,7 @@ from typing import List
 
 from .abstract import AbstractReader
 from .markers import Marker
-from ..byte_stream import ByteStream
+from ..streams import ByteStream
 
 
 class SOS:

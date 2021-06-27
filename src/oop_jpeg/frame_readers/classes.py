@@ -1,4 +1,4 @@
-from ..byte_stream import ByteStream
+from ..streams import ByteStream
 from .markers import Marker
 from .abstract import AbstractReader
 from typing import List, Iterable

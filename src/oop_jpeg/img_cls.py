@@ -1,7 +1,7 @@
 from enum import Enum
 from pathlib import Path
 
-from .byte_stream import ByteStream
+from .streams import ByteStream
 from .frame_readers import ReaderFactory
 
 
