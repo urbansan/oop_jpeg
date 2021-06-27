@@ -1,8 +1,12 @@
-from typing import List
+from typing import List, Dict
+from collections import namedtuple
 
 from .abstract import AbstractReader, AbstractMarker
 from .markers import Marker
-from ..streams import ByteStream
+from ..streams import ByteStream, BitStream
+
+
+AcDc = namedtuple("AcDc", ["ac", "dc"])
 
 
 class SOS(AbstractMarker):
@@ -10,28 +14,20 @@ class SOS(AbstractMarker):
         jpeg_obj.sos = self
 
     def __init__(self):
-        self.color_id_to_huffman_tables = {}
+        self.color_id_to_huffman_table_ids: Dict[int, AcDc] = {}
         self.start_of_selection = 0
         self.end_of_selection = 63
         self.successive_approximation = 0
-        self._huffman_bytes = []
+        self.huffman_bytes = []
 
     def __repr__(self):
         return f"{type(self).__name__}()"
 
     def _get_hft(self, color_id):
         try:
-            return self.color_id_to_huffman_tables[color_id]
+            return self.color_id_to_huffman_table_ids[color_id]
         except KeyError as err:
             raise RuntimeError(f"No color id data in SOS object: '{color_id}'")
-
-    def get_ac(self, color_id):
-        hft = self._get_hft(color_id)
-        return hft["ac"]
-
-    def get_dc(self, color_id):
-        hft = self._get_hft(color_id)
-        return hft["dc"]
 
     def add_color_component(
         self,
@@ -39,10 +35,9 @@ class SOS(AbstractMarker):
         ac_huffman_table_id,
         dc_huffman_table_id,
     ):
-        self.color_id_to_huffman_tables[color_id] = {
-            "dc": dc_huffman_table_id,
-            "ac": ac_huffman_table_id,
-        }
+        self.color_id_to_huffman_table_ids[color_id] = AcDc(
+            dc_huffman_table_id, ac_huffman_table_id
+        )
 
     def read_huffman_bitstream(self, stream: ByteStream):
         while stream:
@@ -50,7 +45,7 @@ class SOS(AbstractMarker):
             if last_byte == 0xFF:
                 current_byte = stream.next_byte()
                 if current_byte == 0x00:
-                    self._huffman_bytes.append(last_byte)
+                    self.huffman_bytes.append(last_byte)
                 elif current_byte == 0xFF:
                     stream.position -= 1  # skip previous byte
                     continue
@@ -59,7 +54,7 @@ class SOS(AbstractMarker):
                 elif current_byte == Marker.EOI.value:
                     break  # break the loop
             else:
-                self._huffman_bytes.append(last_byte)
+                self.huffman_bytes.append(last_byte)
 
     @classmethod
     def from_byte_stream(cls, bytes_):

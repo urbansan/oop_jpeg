@@ -17,7 +17,6 @@ class ByteStream:
     def next_byte(self):
         pos = self.position
         self.position += 1
-        # b = hex(self.bytes[pos])
         return self.bytes[pos]
 
     def next_bytes(self, amount: int):
@@ -31,18 +30,23 @@ class BitStream:
     def __init__(self, bytes_: Iterable):
         self.byte_position = -1
         self.bit_position_generator = self._bit_position_generator(7)
+        self.bit_position = 7
         self.bytes = list(bytes_)
         # self.bit_gen = self.next_bit()
 
-    def next_bit(self):
-        bit_position = next(self.bit_position_generator)
-        if bit_position == 7:
+    @property
+    def is_finished(self):
+        return self.byte_position >= len(self.bytes)
+
+    def next_bit(self, merge_with_bits: int = 0):
+        self.bit_position = next(self.bit_position_generator)
+        if self.bit_position == 7:
             self.byte_position += 1
         try:
-            bit = self.bytes[self.byte_position] >> bit_position & 1
+            bit = self.bytes[self.byte_position] >> self.bit_position & 1
         except IndexError as er:
             raise EOFError("Bit stream has finished") from er
-        return bit
+        return self._merge_bits([merge_with_bits, bit])
 
     def next_bits(self, length):
         bits = [self.next_bit() for _ in range(length)]

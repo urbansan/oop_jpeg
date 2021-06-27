@@ -21,11 +21,8 @@ class DhtReader(AbstractReader):
         return dhts
 
 
-class DHT(AbstractMarker):
+class DHT:
     dht_type = None
-
-    def update_jpeg_obj(self, jpeg_obj):
-        jpeg_obj.dht[self.id] = self
 
     def __init__(self, table_id, symbols: list):
         self.id = table_id
@@ -71,9 +68,15 @@ class DHT(AbstractMarker):
                 return subcls(table_id, symbols)
 
 
-class DHTac(DHT):
+class DHTac(DHT, AbstractMarker):
     dht_type = 1
 
+    def update_jpeg_obj(self, jpeg_obj):
+        jpeg_obj.dht_ac[self.id] = self
 
-class DHTdc(DHT):
+
+class DHTdc(DHT, AbstractMarker):
     dht_type = 0
+
+    def update_jpeg_obj(self, jpeg_obj):
+        jpeg_obj.dht_dc[self.id] = self
