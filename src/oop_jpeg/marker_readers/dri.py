@@ -1,10 +1,13 @@
 from typing import List
 
-from .abstract import AbstractReader
+from .abstract import AbstractReader, AbstractMarker
 from .markers import Marker
 
 
-class DRI:
+class DRI(AbstractMarker):
+    def update_jpeg_obj(self, jpeg_obj):
+        jpeg_obj.dri_interval = self.interval
+
     def __init__(self, interval: int):
         self.interval = interval
 

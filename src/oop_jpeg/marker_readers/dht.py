@@ -1,6 +1,6 @@
 from typing import List
 
-from .abstract import AbstractReader
+from .abstract import AbstractReader, AbstractMarker
 from .markers import Marker
 
 
@@ -21,8 +21,11 @@ class DhtReader(AbstractReader):
         return dhts
 
 
-class DHT:
+class DHT(AbstractMarker):
     dht_type = None
+
+    def update_jpeg_obj(self, jpeg_obj):
+        jpeg_obj.dht[self.id] = self
 
     def __init__(self, table_id, symbols: list):
         self.id = table_id

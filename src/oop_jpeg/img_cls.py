@@ -2,21 +2,33 @@ from enum import Enum
 from pathlib import Path
 
 from .streams import ByteStream
-from .frame_readers import ReaderFactory
+from .marker_readers import ReaderFactory
+from .marker_readers.abstract import AbstractMarker
+from typing import Iterable
 
 
 class Jpeg:
     def __init__(self, filename: Path):
-        self.frames = self._read_frames(filename)
+        markers = self._read_frames(filename)
+        self.unknown_markers = []
+        self.dqt = {}
+        self.dht = {}
+        for marker in markers:
+            marker.update_jpeg_obj(self)
+        self.mcus = self.decode_huffman_bitstream()
         print()
-        # for frame in self.frames:
-        #     frame.update_image_info(self)
+
+    def decode_huffman_bitstream(self):
+        pass
+
+
+
 
     @staticmethod
-    def _read_frames(filename: Path):
+    def _read_frames(filename: Path) -> Iterable[AbstractMarker]:
         bs = ByteStream(filename)
 
-        frames = []
+        markers = []
         while bs:
             last_byte = bs.next_byte()
             if last_byte == 0xFF:
@@ -25,8 +37,8 @@ class Jpeg:
                     bs.position -= 1
                     continue
                 reader = ReaderFactory(current_byte)
-                new_frames = reader.consume_stream(bs)
-                frames += new_frames
+                new_markers = reader.consume_stream(bs)
+                markers += new_markers
             else:
                 raise RuntimeError(f"Got different byte then 0xFF: {hex(last_byte)}")
-        return frames
+        return markers

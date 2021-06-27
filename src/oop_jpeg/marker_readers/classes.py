@@ -1,16 +1,16 @@
 from ..streams import ByteStream
 from .markers import Marker
-from .abstract import AbstractReader
+from .abstract import AbstractReader, AbstractMarker, UnknownMarker
 from typing import List, Iterable
 
 
-class UnknownFrame:
-    def __init__(self, data):
-        self.data = data
-        self.marker_used = Marker.UNKNOWN
-
-    def __repr__(self):
-        return f"<{type(self).__name__} object with marker {self.marker_used!s}>"
+# class UnknownMarker:
+#     def __init__(self, data):
+#         self.data = data
+#         self.marker_used = Marker.UNKNOWN
+#
+#     def __repr__(self):
+#         return f"<{type(self).__name__} object with marker {self.marker_used!s}>"
 
 
 class App0Reader(AbstractReader):
@@ -26,16 +26,14 @@ class UnknownReader(AbstractReader):
             obj.marker_used = self.marker
         return objects
 
-    def _parse_bytes(self, bytes: List[int]):
-        return [UnknownFrame(bytes)]
-
 
 class SoiReader(AbstractReader):
     marker = Marker.SOI
 
     def consume_stream(self, stream: ByteStream):
-        cls = type(self)
-        return [cls([])]
+        marker_obj = UnknownMarker([])
+        marker_obj.marker_used = self.marker
+        return [marker_obj]
 
 
 # class EoiReader(AbstractReader):

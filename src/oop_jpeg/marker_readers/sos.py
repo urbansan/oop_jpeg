@@ -1,11 +1,14 @@
 from typing import List
 
-from .abstract import AbstractReader
+from .abstract import AbstractReader, AbstractMarker
 from .markers import Marker
 from ..streams import ByteStream
 
 
-class SOS:
+class SOS(AbstractMarker):
+    def update_jpeg_obj(self, jpeg_obj):
+        jpeg_obj.sos = self
+
     def __init__(self):
         self.color_id_to_huffman_tables = {}
         self.start_of_selection = 0

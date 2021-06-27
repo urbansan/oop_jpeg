@@ -9,7 +9,7 @@ for cls in get_subclasses(AbstractReader):
     factory_dict[cls.marker.value] = cls
 
 
-def ReaderFactory(byte):
+def ReaderFactory(byte) -> AbstractReader:
     cls = factory_dict.get(byte)
     if cls is None:
         default_frame = UnknownReader([])

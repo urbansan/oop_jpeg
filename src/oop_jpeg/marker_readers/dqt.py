@@ -1,6 +1,6 @@
 from typing import List
 
-from .abstract import AbstractReader
+from .abstract import AbstractReader, AbstractMarker
 from .markers import Marker
 from .util import ZIGZAG
 
@@ -35,8 +35,11 @@ class DqtReader(AbstractReader):
         return list(new_step_bytes)
 
 
-class DQT(list):
+class DQT(list, AbstractMarker):
     zig_zag_indexes = ZIGZAG
+
+    def update_jpeg_obj(self, jpeg_obj):
+        jpeg_obj.dqt[self.id] = self
 
     def __init__(self, table_id):
         super().__init__([[0 for _ in range(8)] for _ in range(8)])
